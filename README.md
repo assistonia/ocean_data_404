@@ -4,12 +4,24 @@ A comprehensive toolkit for purchasing and downloading datasets from Ocean Proto
 
 ## 🌊 Features
 
+- **Real Ocean Protocol Integration**: Direct purchasing from Ocean Protocol marketplace
 - **Automated Dataset Purchase**: Complete workflow from wallet connection to data download
 - **Multiple Purchase Options**: Simple downloader, API client, and full automated purchaser
 - **Wallet Integration**: Support for keystore file-based wallet management
 - **Environment Configuration**: Secure configuration using `.env` files
-- **Sample Data Access**: Quick access to sample datasets for testing
 - **Full Dataset Purchase**: Automated purchasing of complete datasets with OCEAN tokens
+
+## 📊 Available Datasets
+
+### Production Datasets (Ocean Protocol)
+- **Enron Email Subset**: `did:op:1beabb1e18d4d5b15facabf9d0ac2fd38a0b00138ae4b3f9f6649cb6f44458dd`
+  - URL: https://www.cliox.org/asset/did:op:1beabb1e18d4d5b15facabf9d0ac2fd38a0b00138ae4b3f9f6649cb6f44458dd
+- **Cameroon Gazette**: `did:op:204e60c2a0f935d68743955afe1b4bb965770cfbc70342520d6bcecf75befe9c`
+  - URL: https://www.cliox.org/asset/did:op:204e60c2a0f935d68743955afe1b4bb965770cfbc70342520d6bcecf75befe9c
+
+### Sample Datasets (for testing and development)
+- **Enron Sample**: https://e1k3lz2wcg.execute-api.us-west-2.amazonaws.com/data
+- **Cameroon Sample**: https://yjiuaiehxf.execute-api.us-west-2.amazonaws.com/data
 
 ## 📁 Project Structure
 
@@ -37,10 +49,10 @@ ocean-protocol-toolkit/
 
 ```bash
 # Clone the repository
-git clone https://github.com/assistonia/ocean_data_404.git
-cd ocean_data_404
+git clone <your-repository-url>
+cd ocean-protocol-toolkit
 
-# Install dependencies
+# Install Ocean Protocol SDK and dependencies
 pip install -r requirements.txt
 ```
 
@@ -49,40 +61,55 @@ pip install -r requirements.txt
 Copy `.env.example` to `.env` and configure your settings:
 
 ```bash
-cp .env .env.local
+cp .env.example .env
 ```
 
-Edit `.env.local`:
+Edit `.env`:
 ```env
-# Ocean Protocol Configuration
-NETWORK_URL=https://mainnet.infura.io/v3/YOUR_INFURA_KEY
+# Ocean Protocol Configuration - REQUIRED for real purchases
+NETWORK_URL=https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID
 AQUARIUS_URL=https://v4.aquarius.oceanprotocol.com
 PROVIDER_URL=https://v4.provider.oceanprotocol.com
 
-# Wallet Configuration  
+# Wallet Configuration - REQUIRED
 WALLET_KEYSTORE_PATH=team3-f89f413d855d86ec8ac7a26bbfb7aa49df290004.json
 WALLET_PASSWORD=your_wallet_password_here
 ```
 
-### 3. Usage Options
+### 3. Setup Requirements
 
-#### Option A: Sample Data Only (Free)
+#### For REAL Ocean Protocol Purchases:
+1. **Infura Account**: Get your project ID from [Infura.io](https://infura.io)
+2. **OCEAN Tokens**: Ensure your wallet has sufficient OCEAN tokens
+3. **Ethereum Mainnet**: Configured for mainnet transactions
+4. **Wallet Keystore**: Valid keystore file with password
+
+### 4. Usage Options
+
+#### Option A: REAL Dataset Purchase (Recommended)
 ```bash
-# Quick sample download
-python ocean_downloader.py --quick
-
-# Interactive mode
-python ocean_downloader.py
-```
-
-#### Option B: Full Automated Purchase
-```bash
-# Complete automated purchase system
-python auto_ocean_purchaser.py
-
-# Ocean Protocol SDK-based purchaser (requires full setup)
+# Purchase and download real datasets from Ocean Protocol
 python ocean_dataset_purchaser.py
 ```
+⚠️ **Warning**: This makes REAL purchases using OCEAN tokens!
+
+#### Option B: Sample Data Testing (Free)
+```bash
+# Quick sample download for testing
+python ocean_downloader.py --quick
+```
+
+### 5. Dataset Types
+
+#### Production Datasets (Requires OCEAN Tokens)
+- Downloads FULL datasets from Ocean Protocol marketplace
+- Stored in `./purchases/` directory  
+- Requires wallet with OCEAN token balance
+
+#### Sample Datasets (Free)
+- Limited sample data for testing and development
+- Stored in `./downloads/` directory
+- No tokens required
 
 ## 📊 Supported Datasets
 

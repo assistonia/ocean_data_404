@@ -49,24 +49,32 @@ class OceanDatasetPurchaser:
         self._setup_ocean(config_file)
     
     def _setup_ocean(self, config_file: Optional[str] = None):
-        """Setup Ocean instance"""
+        """Setup Ocean instance for REAL Ocean Protocol marketplace"""
         try:
             if config_file and os.path.exists(config_file):
                 self.config = Config(config_file)
             else:
-                # Default Ethereum mainnet configuration
+                # Production Ethereum mainnet configuration for REAL purchases
+                network_url = os.getenv('NETWORK_URL')
+                if not network_url or 'YOUR_INFURA_KEY' in network_url:
+                    logger.warning("⚠️  Please set NETWORK_URL in .env file with your Infura project ID")
+                    logger.warning("Example: NETWORK_URL=https://mainnet.infura.io/v3/YOUR_PROJECT_ID")
+                
                 self.config = Config({
-                    'NETWORK_URL': os.getenv('NETWORK_URL', 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'),
+                    'NETWORK_URL': network_url or 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY',
                     'BLOCK_CONFIRMATIONS': 1,
-                    'AQUARIUS_URL': 'https://v4.aquarius.oceanprotocol.com',
-                    'PROVIDER_URL': 'https://v4.provider.oceanprotocol.com'
+                    'AQUARIUS_URL': os.getenv('AQUARIUS_URL', 'https://v4.aquarius.oceanprotocol.com'),
+                    'PROVIDER_URL': os.getenv('PROVIDER_URL', 'https://v4.provider.oceanprotocol.com')
                 })
             
             self.ocean = Ocean(self.config)
-            logger.info("Ocean instance successfully configured.")
+            logger.info("🌊 Ocean Protocol instance successfully configured for REAL marketplace")
+            logger.info(f"📡 Network: {self.config.network_url}")
+            logger.info(f"🔍 Aquarius: {self.config.aquarius_url}")
+            logger.info(f"⚡ Provider: {self.config.provider_url}")
             
         except Exception as e:
-            logger.error(f"Ocean setup failed: {e}")
+            logger.error(f"❌ Ocean setup failed: {e}")
             raise
     
     def load_wallet_from_keystore(self, keystore_path: str, password: Optional[str] = None) -> bool:
@@ -171,7 +179,7 @@ class OceanDatasetPurchaser:
     
     def purchase_dataset(self, did: str) -> Optional[str]:
         """
-        Purchase dataset
+        Purchase dataset from REAL Ocean Protocol marketplace
         
         Args:
             did: Dataset DID
@@ -181,13 +189,17 @@ class OceanDatasetPurchaser:
         """
         try:
             if not self.wallet:
-                logger.error("Wallet not loaded.")
+                logger.error("❌ Wallet not loaded.")
                 return None
+            
+            logger.info(f"💰 Starting REAL dataset purchase from Ocean Protocol marketplace")
+            logger.info(f"🔗 Dataset DID: {did}")
+            logger.info(f"👛 Wallet address: {self.wallet.address}")
             
             # Resolve dataset
             ddo = self.ocean.assets.resolve(did)
             if not ddo:
-                logger.error(f"Dataset not found: {did}")
+                logger.error(f"❌ Dataset not found: {did}")
                 return None
             
             # Find access service
@@ -312,51 +324,60 @@ class OceanDatasetPurchaser:
             return False
 
 def main():
-    """Main function"""
-    print("=== Ocean Protocol Dataset Auto Purchaser ===\n")
+    """Main function - REAL Ocean Protocol dataset purchase"""
+    print("🌊 === Ocean Protocol REAL Dataset Auto Purchaser ===")
+    print("⚠️  This will make REAL purchases using OCEAN tokens from your wallet!")
+    print("💰 Make sure you have sufficient OCEAN tokens in your wallet.\n")
     
-    # Dataset DID list
+    # Real Ocean Protocol Dataset DID list
     datasets = {
         "enron": "did:op:1beabb1e18d4d5b15facabf9d0ac2fd38a0b00138ae4b3f9f6649cb6f44458dd",
         "cameroon": "did:op:204e60c2a0f935d68743955afe1b4bb965770cfbc70342520d6bcecf75befe9c"
     }
     
     try:
-        # Initialize Ocean purchaser
+        # Initialize Ocean purchaser for REAL marketplace
+        print("🔧 Initializing Ocean Protocol connection...")
         purchaser = OceanDatasetPurchaser()
         
         # Load wallet from environment
         keystore_path = os.getenv('WALLET_KEYSTORE_PATH', 'team3-f89f413d855d86ec8ac7a26bbfb7aa49df290004.json')
         wallet_password = os.getenv('WALLET_PASSWORD')
         
+        print("👛 Loading wallet...")
         if not purchaser.load_wallet_from_keystore(keystore_path, wallet_password):
-            print("Failed to load wallet.")
+            print("❌ Failed to load wallet.")
             return
         
         # User selection
-        print("Please select a dataset to purchase:")
+        print("\n📊 Please select a REAL dataset to purchase from Ocean Protocol:")
         for key, did in datasets.items():
-            print(f"  {key}: {did}")
+            print(f"  🔸 {key.upper()}: {did}")
         
-        choice = input("\nYour choice (enron/cameroon): ").strip().lower()
+        choice = input("\n🎯 Your choice (enron/cameroon): ").strip().lower()
         
         if choice not in datasets:
-            print("Invalid selection.")
+            print("❌ Invalid selection.")
             return
         
         did = datasets[choice]
-        download_path = f"./downloads/{choice}"
+        download_path = f"./purchases/{choice}_full_dataset"
+        
+        print(f"\n🚀 Starting REAL purchase and download for {choice.upper()} dataset...")
+        print(f"📁 Download path: {download_path}")
         
         # Purchase and download
         success = purchaser.purchase_and_download(did, download_path)
         
         if success:
-            print(f"\n✅ Success! Dataset downloaded to {download_path}")
+            print(f"\n🎉 SUCCESS! Real dataset purchased and downloaded to {download_path}")
+            print("💾 This is the FULL dataset from Ocean Protocol marketplace!")
         else:
-            print("\n❌ Failed! Error occurred during purchase or download.")
+            print("\n❌ FAILED! Error occurred during purchase or download.")
+            print("💡 Check your wallet balance, network connection, and configuration.")
             
     except Exception as e:
-        print(f"Error occurred: {e}")
+        print(f"💥 Error occurred: {e}")
         import traceback
         traceback.print_exc()
 
